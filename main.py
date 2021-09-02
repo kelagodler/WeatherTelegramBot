@@ -42,10 +42,9 @@ def deg_to_dir(degrees):
 
 def preprocess_content(message, content):
     content_dict = json.loads(content)
-    city_name = content_dict['name']
-
 
     try:
+        city_name = content_dict['name']
         intro_text = f"Погода {city_name} ({content_dict['coord']['lon']}, {content_dict['coord']['lat']})\n"
         weather_desc = f"{content_dict['weather'][0]['description'].capitalize()}\n"
         weather_data = f"Температура: {kelvin_to_celsius(content_dict['main']['temp'])}°C\n" \
@@ -53,9 +52,8 @@ def preprocess_content(message, content):
                        f"Давление: {hPa_to_mmHg(content_dict['main']['pressure'])} мм рт. ст.\n" \
                        f"Влажность: {content_dict['main']['humidity']}%\n"
         wind_text = f"Ветер {deg_to_dir(content_dict['wind']['deg'])}, {content_dict['wind']['speed']}м/с"
-
     except KeyError:
-        bot.reply_to(message=message, text=f"Сам {city_name}")
+        bot.reply_to(message=message, text=f"Сам {message.text}")
     else:
         output_text = intro_text + weather_desc + weather_data + wind_text
         bot.reply_to(message=message, text=output_text)
@@ -65,6 +63,8 @@ def preprocess_content(message, content):
 def send_welcome(message: Message):
     welcome_text = "Привет! Введи название города или /location"
     bot.reply_to(message=message, text=welcome_text)
+    user_id = message.from_user.id
+    print(user_id)
 
 
 @bot.message_handler(commands=['location'])
@@ -96,3 +96,4 @@ def echo(message: Message):
 
 bot.send_message(chat_id=ADMIN_ID, text="Бот запущен!")
 bot.polling()
+
